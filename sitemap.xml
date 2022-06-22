@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- urlset: reference til sitemap protokol -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mmd.ucn.dk/class/MMD-CSD-S21/10407728/MMD2-Eksamen/index.html</loc>
+    <lastmod>2022-06-16</lastmod>
+  </url>
+  <url>
+    <loc>https://mmd.ucn.dk/class/MMD-CSD-S21/10407728/MMD2-Eksamen/index.html?behandlinger</loc>
+    <lastmod>2022-06-16</lastmod>
+  </url>
+  <url>
+    <loc>https://mmd.ucn.dk/class/MMD-CSD-S21/10407728/MMD2-Eksamen/index.html?om</loc>
+    <lastmod>2022-06-16</lastmod>
+  </url>
+  <url>
+    <loc>https://mmd.ucn.dk/class/MMD-CSD-S21/10407728/MMD2-Eksamen/index.html?kontakt</loc>
+    <lastmod>2022-06-16</lastmod>
+  </url>
+</urlset>

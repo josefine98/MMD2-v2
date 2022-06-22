@@ -1,0 +1,3 @@
+User-agent: *
+Sitemap: https://mmd.ucn.dk/class/MMD-CSD-S21/10407728/MMD2-Eksamen/sitemap.xml
+Disallow: /

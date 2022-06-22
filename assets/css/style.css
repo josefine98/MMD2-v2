@@ -1,0 +1,1238 @@
+@charset "UTF-8";
+/* General */
+:root {
+    --darkPurple: #300A23; 
+    --lightPink: #FFEBF8; 
+    --darkPink: #D6A1C3; 
+    --purple: #570F3E; 
+    --grey: #C9BFC6; 
+    --lightGrey: #FBFBFB; 
+    --white: #FFFFFF; 
+    --black: #000000; 
+    --shadow: #94949452; 
+}
+
+* {
+    margin: 0; 
+    padding: 0; 
+    /* Disables horizontal scroll  */
+    overflow-x: hidden; 
+    
+   
+}
+
+html {
+    background-color: var(--lightGrey);
+    overflow-x: hidden;
+}
+
+body {
+    /* This font is used for headers */
+    font-family: 'Roboto Slab', serif;
+    font-size: 30px; 
+    color: var(--black);
+}
+
+h1 {
+    font-size: 28px;
+    line-height: 2;
+}
+
+h2 {
+    font-size: 22px;
+    line-height: 1.5;
+}
+
+h3 {
+    font-size: 18px;
+    line-height: 1.5; 
+    overflow-x: hidden;
+    
+}
+
+h4 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-weight: 300; 
+    text-align: center;
+    overflow: hidden;
+    /*padding: 50px;*/
+}
+
+
+
+p, li {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 300; 
+    line-height: 1.5; 
+    margin: 1vh 0; 
+}
+
+a {
+    text-decoration: none; 
+    padding: 1vw 1.6vw; 
+    color: var(--black); 
+}
+
+main {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    background-color: var(--white);
+}
+
+main h1 {
+    text-align: center;
+}
+
+main h3 {
+    text-align: center;
+}
+
+section {
+    margin: 8vw 0; 
+}
+
+.kontaktInfo {
+    margin: 8vw 0;
+}
+
+iframe {
+    width: 80vw;
+    height: 60vw;
+    border-radius: 16px;
+}
+
+i {
+    color: var(--darkPurple);
+}
+
+img {
+    object-fit: cover;
+}
+
+/* Header */
+header {
+    width: 100vw; 
+    background-color: var(--white);
+}
+
+.headerImg {
+    width: 100vw; 
+    height: 10vh; 
+    background: url(../images/Header.jpg);
+    background-size: cover;
+}
+
+.navLine {
+    background-color: var(--darkPink);
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Roboto Slab', serif;
+    overflow: hidden;
+}
+
+.LillaHjerte{
+    width: 5.5vw;
+}
+
+.logo .LillaHjerte {
+    width: 10.5vw;
+    position: relative;
+    right: 9.5vw;
+    top: 2vw;
+}
+
+#nav .LillaHjerte {
+    width: 15vw;
+}
+
+
+#menu {
+    font-size: 1.5em;
+    margin-left: auto; 
+    padding: 2vw 4vw;
+}
+
+nav {
+    position: absolute;
+    height: 80vh;
+    width: 100vw;
+    display: flex;
+    padding-top: 20vw;
+    z-index: 2; 
+    margin-top: 10vh; 
+    transform: translateX(-100vw);
+    transition: transform 0.25s ease-in-out;
+    justify-content: center;
+}
+
+header.opened nav {
+    background-color: var(--darkPink);
+    transform: translate(0);
+    height: 100vh;
+    /* margin burder nok være vh, kig på det senere */
+    margin-top: 115vh; 
+    z-index: 5;
+  }
+
+nav ul li {
+    margin: 1vw 0.2vw 0; 
+    text-align: center; 
+    padding: 1vh 0; 
+}
+
+/* Footer */
+footer {
+    border-top: solid var(--darkPink);
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    background-color: var(--white);
+}
+
+footer .logo {
+    margin: 0 8vw; 
+}
+
+.footerColumn {
+    margin: 0 8vw; 
+}
+
+
+#map {
+    width: 80vw; 
+    height: 60vw; 
+    background-color: aliceblue;
+}
+
+.cvr {
+    font-size: 12px;
+    font-weight: 300;
+    align-self: center;
+    margin: 4vh 0;  
+}
+
+/* index.html */
+.introQuote {
+    margin: 8vw 8vw 0;
+}
+
+.introQuote h4 {
+    margin-left: auto; 
+    margin-right: auto; 
+}
+
+
+
+.homeAboutArticle{
+    width: 84vw; 
+    margin: 0 8vw 8vw 8vw;
+    padding: 2vw 0; 
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+}
+
+.circularImg {
+    border-radius: 50%;
+    width: 50vw;
+    height: 50vw;
+    /* Easiest way to center this image was to change the margin to something specific */
+    margin: 8vw 25vw;
+}
+
+.treatmentsSection {
+    width: 100vw; 
+    background-color: var(--lightPink);
+    display: grid; 
+    align-items: center;
+    justify-items: center;
+}
+
+.treatmentsSection img {
+    width: 100vw; 
+    
+}
+
+.treatmentsSection h3 {
+    margin: 3vh 0; 
+}
+
+.treatmentsSection p{
+    width: 80vw;
+}
+
+.homePageCTA {
+    background-color: var(--grey);
+    width: 84vw; 
+    margin: 8vw; 
+    display: flex; 
+    flex-direction: column; 
+    justify-items: center;
+    align-items: center;
+    border-radius: 16px;
+    box-shadow: 6px 6px 8px var(--shadow);
+}
+
+.homePageCTA .circularImg {
+    width: 33vw; 
+    height: 33vw; 
+    margin: 2vh; 
+}
+
+.homePageCTA p {
+    margin: 0 8vw 2vh 8vw; 
+    text-align: center;
+}
+
+.homePageCTA h3 {
+    margin: 0 8vw; 
+}
+
+.testimonialsSection h3 {
+    margin: 3vh 0; 
+}
+
+.testimonialsDivDesktop {
+    display: none; 
+}
+
+#backBtnMobile, #backBtnDesktop, #forwardBtnMobile, #forwardBtnDesktop {
+    background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+    background-color: var(--purple);
+    border-radius: 50%; 
+    width: 50px; 
+    height: 50px; 
+    line-height: 0;
+    text-align: center;
+}
+
+.fa-angle-right, .fa-angle-left {
+    color: var(--white); 
+}
+
+.testimonialsDivMobile {
+    display: flex; 
+    align-items: center; 
+    justify-items: center; 
+}
+
+.testimonialsSection iframe {
+    height: 35vh;
+    margin: 2vw; 
+    width: 70vw;  
+    margin-bottom: 8vw; 
+}
+
+
+
+
+/* behandlinger.html */
+
+.behandlingerP {
+    width: 80vw; 
+    margin: 5vw 0; 
+    text-align: center;
+}
+
+.pricesDiv {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+
+.priceSection {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    background-color: var(--darkPink);
+    padding: 4vw;
+    margin: 2vw 8vw;
+    position: relative; 
+    height: 42vh; 
+}
+
+.priceSection p{
+    width: 84vw; 
+}
+
+.priceDetails {
+    position: absolute;
+    bottom: 4vw;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+
+.bookingButton {
+    background-color: var(--purple);
+    color: var(--white);
+    width: fit-content; 
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-weight: 300; 
+    align-self: center;
+    padding: 16px 32px; 
+    border-radius: 16px;
+    text-transform: uppercase; 
+    box-shadow: inset 0.2vw 0.1vw 0.1vw #ffffff0f, inset  -0.1vw -0.2vw  #ffffff0f;
+ 
+ 
+}
+
+.pricesP {
+    text-align: center;
+    font-weight: bold;
+}
+
+
+
+.aboutTreatmentsSection {
+    margin: 5vw 0; 
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    
+}
+.aboutTreatmentsSection p {
+    width: 80vw; 
+    
+}
+
+.treatmentsGridWrapper {
+    overflow-x: auto;
+    overflow-y: hidden; 
+    white-space: nowrap;
+    width: 100vw;
+    /* for internet explorer og edge */
+    -ms-overflow-style: none;
+    /* for firefox */
+    scrollbar-width: none;
+}
+
+/* for chrome, safari og opera */
+.treatmentsGridWrapper::-webkit-scrollbar {
+    display: none;
+    
+}
+
+.treatmentsGridWrapper p {
+    width: fit-content;
+    height: fit-content;   
+    display: inline-block; 
+    text-align: center;
+    padding: 16px 32px; 
+    border-radius: 16px;
+    background-color: var(--purple);
+    color: var(--white);
+    box-shadow: inset 0.2vw 0.1vw 0.1vw #ffffff0f, inset  -0.1vw -0.2vw  #ffffff0f;
+
+}
+
+.aboutTreatment {
+    background-color: var(--pink);
+    padding: 0 8vw; 
+    margin-top: 8vw; 
+}
+
+.aboutTreatment img {
+    margin: 5vw 0;
+}
+
+/* om.html */
+
+.educationSection {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+}
+
+.educationText {
+    margin: 4vw 0; 
+}
+
+.educationTextDiv {
+    background-color: var(--darkPink);
+    width: 60vw; 
+    height: 11vh;
+    padding: 16px;
+    margin: 8vw 0;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.coursesSection {
+    width: 90vw; 
+}
+
+.coursesSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.nordlysCourses {
+    display: flex;
+    column-gap: 5vw;
+    margin: 2vw 0;
+}
+
+.kstCourses {
+    display: flex;
+    column-gap: 5vw;
+    margin: 2vw 0;
+}
+
+.yearColumn {
+    width: 25vw; 
+}
+
+.yearColumn li {
+    text-align: end;
+}
+
+/* kontakt.html */
+.contactArticle {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    align-items: start;
+    margin: 8vw 0; 
+    width: 80vw;
+}
+
+.contactArticle article {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.kontaktTextEfter {
+margin-top: -7vw;
+}
+
+.contactBoxes, #map {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--grey);
+    width: 80vw; 
+    height: 20vh; 
+    margin: 4vw 0; 
+    border-radius: 16px;
+  
+}
+
+.contactBoxes p {
+    margin: auto 0; 
+    text-align: center;
+    width: 70vw;
+}
+
+.contactBoxes .bookingButton {
+margin-bottom: 3vw;
+
+}
+
+
+
+/* Media queries */
+@media screen and (min-width: 688px) {
+    /* General */
+    main {
+        margin: 0 8vw; 
+    }
+
+    section {
+        margin-bottom: 0; 
+    }
+
+    h4 {
+        font-size: 22px; 
+         width: 80%; 
+    }
+
+    h3 {
+        font-size: 24px; 
+    }
+
+    p, li {
+        font-size: 18px; 
+    }
+
+    
+    
+    /* Header */
+    header.opened nav {
+        margin-top: 120vh; 
+    }
+
+    .headerImg {
+        height: 20vh; 
+    }
+
+    /* Footer */
+    .footerSection {
+        margin: 2vh 0; 
+    }
+
+    footer .logo {
+        margin: 0 6vw; 
+    }
+
+    /* Index.html */
+    .logo {
+        font-size: 25px; 
+    }
+
+    .introQuote {
+        margin: 8vw 0 2vw 0;
+    }
+
+    .introQuote h4 {
+        padding: 2vw 2vw 0;
+
+    }
+
+
+    .circularImg {
+        border-radius: 50%;
+        margin: 2vw 25vw;
+    }
+
+     .homeAboutArticle {
+        margin-bottom: 0; 
+    }
+    
+    .homeAboutArticle p {
+       width: 60vw; 
+    }
+    
+    .treatmentsSection {
+        margin: 4vw 0; 
+    }
+
+    .treatmentsSection p {
+        margin: 0 8vw 4vw 8vw; 
+    }
+
+    .treatmentsSection ul {
+        column-count: 2;
+        margin: 2vw 8vw; 
+    }
+
+    .treatmentsSection img {
+        height: 20vh;
+    }
+
+    .testimonialsSection {
+        margin-top: 0; 
+        width: 80vw; 
+    }
+
+    .reviewSectionMobile iframe {
+        width: 60vw; 
+        height: 20vh; 
+    }
+
+    .testimonialsDivMobile {
+        height: auto; 
+    }
+
+    /* behandlinger.html */
+    .aboutTreatmentsSection {
+        width: 100%; 
+    }
+    
+    .priceSection {
+        height: 35vh; 
+        line-height: 1.5;
+        overflow-x: hidden;
+       
+    }
+
+    .priceSection p{
+        width: 60vw; 
+        line-height: 1.5;
+        overflow-x: hidden;
+        
+    }
+
+    .treatmentsGridWrapper {
+        height: fit-content; 
+        display: grid;
+        grid-template-columns: auto;
+        grid-column-gap: auto; 
+        justify-items: center;
+        width: 80vw;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .treatmentsGridWrapper p {
+        width: 25vw;
+    }
+
+    .behandlingerP {
+        width: 60vw; 
+    }
+
+    .introCitat {
+        width: 60vw;
+        margin-left: auto; 
+        margin-right: auto; 
+    }
+
+    /* om.html */
+    .aboutClinicSection {
+        display: flex; 
+        margin: 2vw; 
+        justify-content: space-between;
+    }
+
+    .coursesContent {
+        display: flex; 
+        width: 80vw; 
+        justify-content: space-between;
+    }
+
+    .coursesContent img {
+        width: 40vw; 
+    }
+
+    
+    .educationTextDiv p {
+        width: 80%; 
+    }
+
+    /* kontakt.html */
+
+    .contactArticle {
+    grid-template-columns: 1fr 1fr;
+    }
+
+    .contactBoxes, #map {
+    width: 60vw; 
+    overflow-x: hidden;
+}
+
+    
+}
+
+@media screen and (min-width: 992px) {
+    /* General */
+    h1 {
+        margin-top: 8vh;
+    }
+
+    .introQuote {
+        margin: 2vh 0; 
+    }
+
+   
+
+    /* Header */
+    #menu {
+        display: none; 
+      }
+  
+    header nav {
+      transform: none; 
+      transition: none;
+      margin: 0 0 0 20vw; 
+      padding: 0; 
+    }
+
+    .headerImg {
+        height: 30vh; 
+    }
+  
+    .navLine {
+      align-items: baseline;
+      flex-direction: row;
+    }
+
+    nav ul {
+        display: flex;
+        flex-direction: row;
+        margin-top: 1vh;
+    }
+
+    .bookingNav {
+        background-color: var(--Purple);
+        color: var(--white);
+        border-radius: 16px;
+        background-color: #570F3E; 
+        box-shadow: inset 0.2vw 0.1vw 0.1vw #ffffff0f, inset  -0.1vw -0.2vw  #ffffff0f;
+    }
+
+    .heartLogoNav {
+        display: none;
+    }
+
+    .logo .LillaHjerte {
+       width: 3vw;
+       position: relative;
+       top: 0.5vw;
+       right: 2vw;
+    }
+
+    /* Footer */
+
+    .footerColumns {
+        display: flex; 
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 0 8vw; 
+        width: 80vw; 
+    }
+
+    .footerColumn {
+        width: 33%; 
+        margin: 0; 
+    }
+
+    #map {
+        width: 30vw; 
+        height: 20vw; 
+    }
+
+    footer a {
+        align-self: flex-start;
+    }
+
+    
+
+    /* Index.html */
+    .introQuote {
+        width: 60vw; 
+    }
+
+    .homeAboutArticle {
+        flex-direction: row;
+        padding: 4vw; 
+        margin: 0 8vw; 
+    }
+
+    .homeAboutArticle div {
+        width: 45vw; 
+    }
+
+    .circularImg {
+        width: 25vw; 
+        height: 25vw; 
+        margin: auto; 
+    }
+
+    .testimonialsDivDesktop {
+        display: block; 
+        height: 30vh; 
+        overflow-y: hidden; 
+    }
+
+    .testimonialsDivMobile {
+        display: none;
+    }
+
+    .testimonialsDivDesktop, .reviewSectionDesktop {
+        display: flex; 
+        align-items: center; 
+        justify-items: center; 
+    }
+
+    .reviewSectionDesktop iframe {
+        display: flex; 
+        width: 30vw; 
+        height: 30vh; 
+    }
+
+
+    .CTASection {
+        display: flex;
+        margin: 8vh 8vw; 
+        justify-items: center;
+    }
+    
+    .CTASection .circularImg {
+        width: 15vw; 
+        height: 15vw; 
+    }
+    
+    .homePageCTA {
+        padding: 0; 
+        width: 30%;
+        margin: 0 auto;  
+    }
+
+    .homePageCTA h3, .CTASection a p {
+        width: 80%; 
+    }
+
+    .treatmentsSection {
+        display: grid; 
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: 
+        "treatmentsSectionText treatmentsSectionImg";
+        justify-items: center;
+        align-items: center;
+        width: 68vw;
+        margin: 4vw 0; 
+    }
+
+    .treatmentsSection p {
+        width: 40vw;
+    }
+
+    .treatmentsSectionText {
+        grid-area: treatmentsSectionText;
+    }
+
+    .homeAboutArticle .circularImg {
+        width: 20vw;
+        height: 20vw;
+        margin: 0 6vw; 
+    }
+
+    .homeAboutArticle p {
+        width: 100%; 
+        margin: 2vw; 
+    }
+
+    .treatmentsSection img {
+        grid-area: treatmentsSectionImg;
+        width: 100%; 
+        height: 100%;
+    }
+
+
+
+    /* behandlinger.html */
+    .pricesDiv {
+        display: flex; 
+        flex-direction: row;
+        align-items: center;
+        justify-items: center;
+    }
+    
+    .priceSection {
+        width: 30vw; 
+        height: 50vh; 
+        margin: 2vw 2vw;
+    }
+
+    .priceSection p{
+        width: 30vw; 
+    }
+
+    .behandlingerP {
+        width: 50vw; 
+    }
+
+    .aboutTreatmentsSection {
+        margin: 8vh 0; 
+        width: 60vw; 
+    }
+
+    .aboutTreatmentsSection p {
+        width: 100%; 
+    }
+
+    .treatmentsGridWrapper {
+        grid-template-columns: repeat(3, 1fr); 
+        grid-column-gap: 4vw;
+        width: 80vw; 
+    }
+
+    .treatmentsGridWrapper p {
+        width: 75%; 
+    }
+    
+
+     /* om.html */
+     .educationSection h3 {
+        margin-bottom: 2vw; 
+    }
+
+    .educationText {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .educationText p {
+        margin: 1vw; 
+        padding: 3vw 1vw;
+    }
+    
+    .educationText {
+        flex-direction: row;
+    }
+    
+    .educationTextDiv {
+        width: 25vw; 
+        height: 30vh;
+        padding: 0;
+        margin: 1vw;
+    }
+
+    .coursesSection {
+        margin: 2vh 0; 
+        width: 80vw;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .yearColumn {
+        width: 10vw;
+    }
+
+    /* kontakt.html */
+    .contactArticle {
+        grid-template-columns: repeat(4, 1fr);
+        margin: 0;
+        height: auto; 
+    }
+
+    .contactBoxSection {
+        display: flex;
+        column-gap: 4vw;
+        margin: 0; 
+    }
+
+    .contactBoxes, #map {
+        width: 35vw;
+        height: 30vh;
+    }
+
+     /*Hover*/
+     .bookingNav:hover, .bookingButton:hover, .treatmentsGridWrapper p:hover {
+        background-color: var(--darkPurple); 
+        box-shadow: inset 0.2vw 0.1vw 0.1vw  #ffffff1b, inset  -0.1vw -0.2vw  #ffffff1b;
+      }
+    
+      .underline {
+        position: relative;
+      }
+    
+      .underline:hover:after{
+        content: "";
+        position: absolute;
+        background-color: var(--purple);
+        height: 1.5px;
+        bottom: 0.5vw;
+        width: 100%;
+        left: 0;
+        
+      }
+
+      .homePageCTA:hover {
+          background-color: #bbb1b8;
+      }
+
+}
+
+
+@media screen and (min-width: 1312px){
+    /* General */
+    h1 {
+        font-size: 50px; 
+    }
+
+    h2 {
+        font-size: 40px; 
+    }
+
+    h3 {
+        font-size: 24px;
+    }
+
+    h4 {
+        font-size: 30
+    }
+
+    p {
+        font-size: 18px;
+    }
+
+    main {
+        margin: 0 16vw; 
+    }
+
+    .homeAboutArticle {
+        width: 100%; 
+    }
+
+    .homeAboutArticle .circularImg {
+        width: 20vw;
+        height: 20vw;
+    }
+
+    .homeAboutArticle p {
+        width: 80%; 
+        margin: 2vw; 
+    }
+
+    .testimonialsSection {
+        width: 65vw; 
+    }
+
+    .testimonialsSection iframe {
+        margin: 1vw; 
+    }
+
+    /* index.html */
+    .aboutClinicSection img {
+        width: 33%; 
+    }
+
+    .contactText {
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .bookingButton {
+        padding: 1vw 2vw; 
+    }
+
+
+    .homeAboutArticle div {
+        width: 35vw; 
+    }
+
+    .CTASection {
+        width: 68vw;
+    }
+
+    .homePageCTA {
+        padding: 0; 
+        width: 30%;
+        margin: 0 auto;
+    }
+
+    .testimonialsDivDesktop {
+        height: 40vh; 
+        margin-bottom: 8vw;
+    }
+
+    .reviewSectionDesktop {
+        margin-top: 4vw; 
+    }
+
+    /* behandlinger.html */
+
+    .priceSection {
+        width: 33vw;
+        height: 55vh; 
+        padding: 4vw 0; 
+    }
+
+    .priceSection p{
+        width: 24vw; 
+        
+    }
+
+    .treatmentsGridWrapper {
+        grid-template-columns: repeat(3, 1fr); 
+        grid-column-gap: 0; 
+        width: 70vw; 
+    }
+
+    .treatmentsGridWrapper p {
+        width: 70%; 
+    }
+
+    .behandlingerP {
+        margin: 0; 
+    }
+
+    .aboutTreatmentsSection p {
+        width: 50vw; 
+    }
+
+     /* om.html */
+
+     .educationSection {
+        margin-top: 0; 
+     }
+    
+    .educationTextDiv {
+        width: 20vw; 
+        height: 30vh;
+    }
+
+    .coursesSection {
+        margin: 2vh 0; 
+        width: 80vw;
+        flex-direction: row;
+        justify-content: center;
+        column-gap: 4vw;
+    }
+
+    .nordlysCourses, .kstCourses {
+        width: 30vw;
+    }
+
+    .yearColumn {
+        width: 8vw;
+    }
+
+    .educationTextDiv {
+        height: 33vh; 
+    }
+
+    /* kontakt.html */
+    .contactArticle {
+        width: 65vw;
+        height: auto; 
+    }
+
+    .contactArticle section{
+        width: 15vw;
+    }
+
+    .contactBoxes, #map {
+        width: 30vw;
+    }
+
+    .contactBoxes h4 {
+        margin-bottom: 2vw; 
+    }
+
+    .backBtnDesktop{
+       background-color: transparent;
+       border: none;
+       font-size: 50px;
+    }
+
+    .forwardBtnDesktop{
+        background-color: transparent;
+        border: none;
+     }
+ 
+} 
+
+
+
+
+  
+
