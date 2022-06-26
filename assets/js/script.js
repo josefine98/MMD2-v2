@@ -4,23 +4,13 @@ const apiUserCredentials = {
     "password": "4*6J9Pcf%^W6rgqHt54Jji#1"
 };
 
-var forsideId = 6;
-var behandlingerId = 7;
-var omMigId = 8;
-var kontaktId = 9;
+// var forsideId = 6;
+const forsideV2Id = 10;
+const behandlingerId = 7;
+const omMigId = 8;
+const kontaktId = 9;
+const tagHjaelperMedId = 11;
 
-//Array af reviews taget fra Facebooks "Indlejr" funktion på anmeldelser 
-let reviews = [
-    '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3D7672108286163733%26id%3D100000939134571&show_text=true&width=500" width="500" height="247" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
-
-    '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fannechristineblicher.bonnerup%2Fposts%2F10226931049082802&show_text=true&width=500" width="500" height="208" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
-
-    '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3D800531127769351%26id%3D100034374123631&show_text=true&width=500" width="500" height="194" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
-
-    '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fanette.hechtpedersen.7%2Fposts%2F482451496984085&show_text=true&width=500" width="500" height="194" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
-
-    '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Flaila.sorensen.7%2Fposts%2F10228088327092675&show_text=true&width=500" width="500" height="165" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>'
-];
 
 
 //Kald af initPage() funktionen, der starter siden op 
@@ -36,15 +26,15 @@ function initPage() {
         },
         body: JSON.stringify(apiUserCredentials) //JSON streng
     })
-    .then(response => response.json()) //Laver responset om til JS objekt som følger JSON format
-    .then(jsDataObj => {
-        window.localStorage.setItem('authToken', jsDataObj.data.token); //Gemmer vores token i browserens local storage 
-        renderPage(); //Sætter siden på
-    })
-    //Hvis det ikke lykkedes at få fat i et response udskrives en error i consolen 
-    .catch(error => {
-        console.log(error);
-    })
+        .then(response => response.json()) //Laver responset om til JS objekt som følger JSON format
+        .then(jsDataObj => {
+            window.localStorage.setItem('authToken', jsDataObj.data.token); //Gemmer vores token i browserens local storage 
+            renderPage(); //Sætter siden på
+        })
+        //Hvis det ikke lykkedes at få fat i et response udskrives en error i consolen 
+        .catch(error => {
+            console.log(error);
+        })
 }
 
 //Funktionen renderNav() og renderPage() er inspireret af Dan Høeghs videolektion "MMD - Sem 2, tema 2 - API 1 - lektion på dansk" fra d.14/3 2020
@@ -64,7 +54,7 @@ function renderPage() {
     } else if (url.indexOf('kontakt') > -1) {
         renderKontakt();
     } else {
-        renderForside();
+        renderForside2();
     }
 
     renderFooter();
@@ -113,6 +103,258 @@ function renderNav() {
     });
 }
 
+
+//renderForside2() fetcher dataen der skal bruges til at lave forsiden og kalder de funktioner der bruges til at vise indholdet
+function renderForside2() {
+    //Fetcher posts i kategorien "forsideV2"
+    fetch(`${apiUrl}posts?status=private&categories=${forsideV2Id}`, {
+        headers: {
+            'Authorization': `Bearer ${window.localStorage.getItem("authToken")}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        //Fetcher dataen, der bruges i "Jeg kan hjælpe med" sektionen, som er sat ind som et tag i Wordpress
+        fetch(`${apiUrl}posts?status=private&tags=${tagHjaelperMedId}`, {
+            headers: {
+                'Authorization': `Bearer ${window.localStorage.getItem("authToken")}`
+            }
+        })
+        .then(response => response.json())
+        .then(treatmentData => {
+
+            //Laver meta titel og description i <head> tagget
+            createPageHead(data);
+
+            //laver intro sektionen
+            createIntroSection(data);
+
+            //Laver "Jeg kan hjælpe med" sektionen
+            createTreatmentsSection(treatmentData);
+
+            //Laver CTA'erne på forsiden
+            createCTASection(data);
+
+            //Laver sektionen med anmeldelser fra Facebook
+            createReviews();
+        })
+    })
+    .catch(error => {
+        console.log(error);
+    })
+}
+
+//createPageHead() laver den HTML der skal ind i <head> tagget i index.html
+function createPageHead(data) {
+    let content = `
+        <title>${data[0].acf.meta_data.titel}</title>"
+        <meta name="description" content="${data[0].acf.meta_data.beskrivelse}">
+    `;
+    document.querySelector("head").innerHTML += content;
+}
+
+//createIntroSection() laver HTML'en til intro sektionen på siden. Den er lavet med henblik på, at funktionen skal kunne bruges
+//på de andre sider, derfor tjekkes om intro_citat findes. 
+function createIntroSection(data) {
+    let content = "";
+
+    //Her tjekkes, om der er et intro objekt med propertien intro_citat
+    if (data[0].acf.intro.hasOwnProperty("intro_citat")) {
+        content += `
+            <article class="introQuote">
+                <h4>${data[0].acf.intro.intro_citat}</h4>
+            </article>
+        `;
+    }
+
+    content += `
+        <article class="homeAboutArticle">
+            <img class="circularImg" src="${data[0].acf.intro.billede}" alt="${data[0].acf.intro.billede.billedetekst}">
+            <div>
+                <p>${data[0].acf.intro.intro_tekst}</p>
+            </div>
+        </article>
+    `;
+
+    document.querySelector("main").innerHTML += content;
+}
+
+
+//createTreatmentsSection() laver "Jeg kan hjælpe med" sektionen, ved at bruge data fra "kan hjalpe med" tagget
+function createTreatmentsSection(treatmentData) {
+    let content = "";
+    listElement = "";
+
+    content = `
+            <section class="treatmentsSection">
+                <img src="${treatmentData[0].acf.billede}" alt="Billede af en solnedgang">
+                <div class="treatmentsSectionText">
+                    <h3>${treatmentData[0].acf.overskrift}</h3>
+                    <ul id="treatmentList">
+                    </ul>
+                    <p>${treatmentData[0].acf.slut_tekst}</p>
+                </div>
+            </section>
+        `;
+
+    document.querySelector("main").innerHTML += content;
+
+    //Går igennem alle punkter og sætter den ind i ul'en i content ovenfor hvis de er udfyldt, og dermed ikke ""
+    //Object.values() returnerer et array af objektet punkter's værdier, og der kan derefter laves en for each løkke på arrayet 
+    //Inspiration fra: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values 
+    Object.values(treatmentData[0].acf.punkter).forEach(punkt => {
+        if (punkt != "") {
+            listElement = `<li>${punkt}</li>`;
+            document.querySelector("#treatmentList").innerHTML += listElement;
+        }
+    });
+}
+
+//createCTASection() laver CTA'erne på forsiden. Object.values() bruges på samme måde som i createTreatmentsSection()
+//til at loope over de tre CTA bokse
+function createCTASection(data) {
+    let content = "";
+
+    content = `
+        <section>
+            <h4 class="introCitat">${data[0].acf.citat} <br> <img class="LillaHjerte" src="assets/images/hjerte.svg" alt="Lilla Hjerte"></h4>
+            <div class="CTASection">
+            </div>
+        </section>
+    `;
+
+    document.querySelector("main").innerHTML += content;
+
+    Object.values(data[0].acf.cta_section).forEach(element => {
+        document.querySelector(".CTASection").innerHTML += `
+            <a class="homePageCTA" href="index.html?behandlinger">
+                <img class="circularImg" src="${element.billede}" alt="Susanne igang med en behandling">
+                <h3>${element.overskrift}</h3>
+                <p>${element.tekst}</p>
+            </a>
+        `;
+    });
+}
+
+//createReviews() opretter et array af reviews og anmeldelser sektionen
+//Derefter kaldes showReviewsMobile() og showReviewsDesktop(), som styrer visningen af anmeldelserne 
+function createReviews() {
+    let content = "";
+
+    //Array af reviews taget fra Facebooks "Indlejr" funktion på anmeldelser 
+    //Flyttet for ikke at have for mange globale variable
+    let reviews = [
+        '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3D7672108286163733%26id%3D100000939134571&show_text=true&width=500" width="500" height="247" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
+
+        '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fannechristineblicher.bonnerup%2Fposts%2F10226931049082802&show_text=true&width=500" width="500" height="208" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
+
+        '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3D800531127769351%26id%3D100034374123631&show_text=true&width=500" width="500" height="194" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
+
+        '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fanette.hechtpedersen.7%2Fposts%2F482451496984085&show_text=true&width=500" width="500" height="194" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>',
+
+        '<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Flaila.sorensen.7%2Fposts%2F10228088327092675&show_text=true&width=500" width="500" height="165" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>'
+    ];
+
+    content += `
+            <section class="testimonialsSection">
+                <h3>Det siger mine kunder om mig</h3>
+                <div class="testimonialsDivMobile">
+                    <!-- Angle-left ikon: https://fontawesome.com/icons/angle-left?s=solid -->
+                    <button id="backBtnMobile"><i class="fa-solid fa-angle-left"></i></button>
+                    <section class="reviewSectionMobile"></section>
+                    <!-- Angle-right ikon: https://fontawesome.com/icons/angle-right?s=solid -->
+                    <button id="forwardBtnMobile"><i class="fa-solid fa-angle-right"></i></button>
+                </div>
+        
+                <div class="testimonialsDivDesktop">
+                    <!-- Angle-left ikon: https://fontawesome.com/icons/angle-left?s=solid -->
+                    <button id="backBtnDesktop"><i class="fa-solid fa-angle-left"></i></button>
+                    <section class="reviewSectionDesktop"></section>
+                    <!-- Angle-right ikon: https://fontawesome.com/icons/angle-right?s=solid -->
+                    <button id="forwardBtnDesktop"><i class="fa-solid fa-angle-right"></i></button>
+                </div>
+            </section>
+        `;
+
+    document.querySelector('main').innerHTML += content;
+
+    //Funktionskald af showReviewsMobile og showReviewsDesktop - begge kaldes her, men indholdet der vises på siden styres af 
+    //media queries i style.css
+    showReviewsMobile(reviews);
+    showReviewsDesktop(reviews);
+}
+
+
+//showReviewsMobile(reviews) sørger for visningen af anmeldelser på mobilversionen af hjemmesiden
+function showReviewsMobile(reviews) {
+    var reviewSection = document.querySelector('.reviewSectionMobile');
+    var backBtn = document.querySelector('#backBtnMobile');
+    var forwardBtn = document.querySelector('#forwardBtnMobile');
+
+    //i repræsenterer indekset af reviews[]. Starter på 0
+    let i = 0;
+    reviewSection.innerHTML = reviews[i];
+
+    //Når der klikkes på forwardBtn tælles i én op og reviewSections innerHTML ændres til den næste anmeldelse 
+    forwardBtn.addEventListener('click', () => {
+        i = i + 1;
+        reviewSection.innerHTML = reviews[i];
+        //Hvis i ender på den sidste anmeldelse fjernes knappen, så der ikke kan trykkes videre ved at sætte display: none på i 
+        //style.css
+        if (i === reviews.length - 1) {
+            forwardBtn.style.display = "none";
+        }
+        //backBtn styles med display: block, så den altid vises når der er mulighed for at gå tilbage, altså når der er trykket på 
+        //forwardBtn knappen
+        backBtn.style.display = "block";
+    });
+
+    //Her sker det omvendte af ovenstående event listener, hvor i tælles ned i stedet for, og ikke kan gå under 0 
+    backBtn.addEventListener('click', () => {
+        i = i - 1;
+        reviewSection.innerHTML = reviews[i];
+        if (i === 0) {
+            backBtn.style.display = "none";
+        }
+        forwardBtn.style.display = "block";
+    });
+}
+
+//showReviewsDesktop(reviews) sørger for visningen af anmeldelser på mobilversionen af hjemmesiden
+//Fungerer på samme måde som showReviewsMobile(reviews), med nogle få justeringer som gennemgås her
+function showReviewsDesktop(reviews) {
+    var reviewSection = document.querySelector('.reviewSectionDesktop');
+    var backBtn = document.querySelector('#backBtnDesktop');
+    var forwardBtn = document.querySelector('#forwardBtnDesktop');
+
+    let i = 0;
+    //I stedet for at vise det første element vises to 
+    reviewSection.innerHTML = reviews[i];
+    reviewSection.innerHTML += reviews[i + 1];
+    forwardBtn.addEventListener('click', () => {
+        i = i + 1;
+        //Her vises to elementer i stedet for et, hvor det sidste tælles op
+        reviewSection.innerHTML = reviews[i];
+        reviewSection.innerHTML += reviews[i + 1];
+        if (i + 1 === reviews.length - 1) {
+            forwardBtn.style.display = "none";
+        }
+        backBtn.style.display = "block";
+    });
+
+    backBtn.addEventListener('click', () => {
+        i = i - 1;
+        //Her vises to elementer i stedet for et, hvor det sidste tælles op
+        reviewSection.innerHTML = reviews[i];
+        reviewSection.innerHTML += reviews[i + 1];
+        if (i === 0) {
+            backBtn.style.display = "none";
+        }
+        forwardBtn.style.display = "block";
+    });
+}
+
+
 //renderBehandlinger() opretter HTML'en for "Behandlinger" siden og sætter den ind i <main> i index.html
 function renderBehandlinger() {
     // Titel og metabeskrivelse til <head>
@@ -129,15 +371,15 @@ function renderBehandlinger() {
         }
 
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        let content = "";
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            let content = "";
 
-        //Fordi der er ét indlæg i kategorien, svarer det til det første element i data[] arrayet
-        //.acf finder vores custom fields i data[]
-        //Dernæst bruges navnene på felterne til at få fat i dataen
-        content += `
+            //Fordi der er ét indlæg i kategorien, svarer det til det første element i data[] arrayet
+            //.acf finder vores custom fields i data[]
+            //Dernæst bruges navnene på felterne til at få fat i dataen
+            content += `
             <h1>${data[0].acf.titel}</h1>    
             <section class="homeAboutArticle">
                 <img class="circularImg" src="${data[0].acf.behandlinger_billede.url}" alt="Portrætbillede af Susanne Holtze">
@@ -222,95 +464,95 @@ function renderBehandlinger() {
             </section>
         `;
 
-        document.querySelector('main').innerHTML += content;
+            document.querySelector('main').innerHTML += content;
 
-        //Følgende event listeners er ens, og sørger for, at når der klikkes på en knap med en behandlingsform
-        //vil de rette elementer blive sat ind i "currentTreatment" sektionen 
-        document.querySelector(".treatmentTitle1").addEventListener('click', () => {
-            console.log(data[0].acf.behandlingsform_1.billede.url);
-            treatment = `<div class="treatmentsSectionText">
+            //Følgende event listeners er ens, og sørger for, at når der klikkes på en knap med en behandlingsform
+            //vil de rette elementer blive sat ind i "currentTreatment" sektionen 
+            document.querySelector(".treatmentTitle1").addEventListener('click', () => {
+                console.log(data[0].acf.behandlingsform_1.billede.url);
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_1.titel}</h3>
             <p>${data[0].acf.behandlingsform_1.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_1.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle2").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle2").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
                 <h3>${data[0].acf.behandlingsform_2.titel}</h3>
                 <p>${data[0].acf.behandlingsform_2.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_2.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle3").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle3").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_3.titel}</h3>
             <p>${data[0].acf.behandlingsform_3.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_3.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle4").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle4").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_4.titel}</h3>
             <p>${data[0].acf.behandlingsform_4.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_4.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle5").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle5").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_5.titel}</h3>
             <p>${data[0].acf.behandlingsform_5.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_5.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle6").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle6").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_6.titel}</h3>
             <p>${data[0].acf.behandlingsform_6.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_6.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle7").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle7").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_7.titel}</h3>
             <p>${data[0].acf.behandlingsform_7.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_7.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle8").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle8").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_8.titel}</h3>
             <p>${data[0].acf.behandlingsform_8.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_8.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
 
-        document.querySelector(".treatmentTitle9").addEventListener('click', () => {
-            treatment = `<div class="treatmentsSectionText">
+            document.querySelector(".treatmentTitle9").addEventListener('click', () => {
+                treatment = `<div class="treatmentsSectionText">
             <h3>${data[0].acf.behandlingsform_9.titel}</h3>
             <p>${data[0].acf.behandlingsform_9.tekst}</p>
             </div>
             <img src="${data[0].acf.behandlingsform_9.billede}" alt="Billede af natur"></img>`;
-            document.querySelector("#currentTreatment").innerHTML = treatment;
-        });
-    })
-    .catch(error => {
-        console.log(error);
-    })
+                document.querySelector("#currentTreatment").innerHTML = treatment;
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        })
 }
 
 
@@ -326,12 +568,12 @@ function renderOm() {
             'Authorization': `Bearer ${window.localStorage.getItem("authToken")}`
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        let content = "";
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            let content = "";
 
-        content += `
+            content += `
             <h1>${data[0].acf.om_titel}</h1>
 
             <section class="homeAboutArticle">
@@ -439,17 +681,17 @@ function renderOm() {
             </section>
         `;
 
-        document.querySelector('main').innerHTML += content;
+            document.querySelector('main').innerHTML += content;
 
-        //Funktionskald af showReviewsMobile og showReviewsDesktop - begge kaldes her, men indholdet der vises på siden styres af 
-        //media queries i style.css
-        showReviewsMobile(reviews);
-        showReviewsDesktop(reviews);
-    })
+            //Funktionskald af showReviewsMobile og showReviewsDesktop - begge kaldes her, men indholdet der vises på siden styres af 
+            //media queries i style.css
+            showReviewsMobile(reviews);
+            showReviewsDesktop(reviews);
+        })
 
-    .catch(error => {
-        console.log(error);
-    })
+        .catch(error => {
+            console.log(error);
+        })
 }
 
 //renderKontakt() opretter HTML til "Kontakt" siden og sætter det ind i <main> i index.html
@@ -464,13 +706,13 @@ function renderKontakt() {
             'Authorization': `Bearer ${window.localStorage.getItem("authToken")}`
         }
     })
-    .then(response => response.json())
+        .then(response => response.json())
 
-    .then(data => {
-        console.log(data);
-        let content = "";
+        .then(data => {
+            console.log(data);
+            let content = "";
 
-        content += `
+            content += `
             <h1>${data[0].acf.kontakt_titel}</h1>
             <h4 class="introQuote">${data[0].acf.kontakt_intro_tekst}</h4>
 
@@ -514,190 +756,123 @@ function renderKontakt() {
             </section>
         `;
 
-        document.querySelector('main').innerHTML += content;
-    })
+            document.querySelector('main').innerHTML += content;
+        })
 
-    .catch(error => {
-        console.log(error);
-    })
+        .catch(error => {
+            console.log(error);
+        })
 }
 
-//renderForside() opretter HTML til forsiden og sætter det ind i <main> i index.html
-function renderForside() {
-    let title = "<title>Massage v. Susanne Holtze</title>";
-    document.querySelector("head").innerHTML += title;
-    let metaText = `<meta name="description" content="Susanne Holtze tilbyder massage,
-        som lytter til din krop, og behandlingen tager altid udgangspunkt i at møde dig, der hvor du er. ">`
-    document.querySelector("head").innerHTML += metaText;
+// //renderForside() opretter HTML til forsiden og sætter det ind i <main> i index.html
+// function renderForside() {
+//     let title = "<title>Massage v. Susanne Holtze</title>";
+//     document.querySelector("head").innerHTML += title;
+//     let metaText = `<meta name="description" content="Susanne Holtze tilbyder massage,
+//         som lytter til din krop, og behandlingen tager altid udgangspunkt i at møde dig, der hvor du er. ">`
+//     document.querySelector("head").innerHTML += metaText;
 
-    fetch(`${apiUrl}posts?status=private&categories=${forsideId}`, {
-        headers: {
-            'Authorization': `Bearer ${window.localStorage.getItem("authToken")}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        let content = "";
-        content += `
-            <article class="introQuote">
-                <h4>${data[0].acf.intro_citat}</h4>
-            </article>
+//     fetch(`${apiUrl}posts?status=private&categories=${forsideId}`, {
+//         headers: {
+//             'Authorization': `Bearer ${window.localStorage.getItem("authToken")}`
+//         }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log(data);
+//         let content = "";
+//         content += `
+//             <article class="introQuote">
+//                 <h4>${data[0].acf.intro_citat}</h4>
+//             </article>
 
-            <article class="homeAboutArticle">
-                <img class="circularImg" src="${data[0].acf.susanne_billede.url}" alt="Portrætbillede af Susanne Holtze">
-                <div>
-                    <p>${data[0].acf.intro_tekst}</p>
-                </div>
-            </article>
+//             <article class="homeAboutArticle">
+//                 <img class="circularImg" src="${data[0].acf.susanne_billede.url}" alt="Portrætbillede af Susanne Holtze">
+//                 <div>
+//                     <p>${data[0].acf.intro_tekst}</p>
+//                 </div>
+//             </article>
 
-            <section class="treatmentsSection">
-                <img src="${data[0].acf.hjaelper_med_sektion.hjaelper_med_billede.url}" alt="Billede af en solnedgang">
-                <div class="treatmentsSectionText">
-                    <h3>${data[0].acf.hjaelper_med_sektion.hjaelper_med_overskrift}</h3>
-                    <ul>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_1}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_2}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_3}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_4}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_5}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_6}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_7}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_8}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_9}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_10}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_11}</li>
-                        <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_12}</li>
-                    </ul>
-                    <p>${data[0].acf.hjaelper_med_sektion.hjaelper_med_sluttekst}</p>
-                </div>
-            </section>
+//             <section class="treatmentsSection">
+//                 <img src="${data[0].acf.hjaelper_med_sektion.hjaelper_med_billede.url}" alt="Billede af en solnedgang">
+//                 <div class="treatmentsSectionText">
+//                     <h3>${data[0].acf.hjaelper_med_sektion.hjaelper_med_overskrift}</h3>
+//                     <ul>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_1}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_2}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_3}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_4}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_5}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_6}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_7}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_8}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_9}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_10}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_11}</li>
+//                         <li>${data[0].acf.hjaelper_med_sektion.hjaelper_med_12}</li>
+//                     </ul>
+//                     <p>${data[0].acf.hjaelper_med_sektion.hjaelper_med_sluttekst}</p>
+//                 </div>
+//             </section>
 
-            <section>
-                <h4 class="introCitat">${data[0].acf.cta_intro_citat} <br> <img class="LillaHjerte" src="assets/images/hjerte.svg" alt="Lilla Hjerte"></h4>
-                
-                <div class="CTASection">
-                    <a class="homePageCTA" href="index.html?behandlinger">
-                        <img class="circularImg" src="${data[0].acf.cta_1_billede.url}" alt="Susanne igang med en behandling">
-                        <h3>${data[0].acf.cta_1_overskrift}</h3>
-                        <p>${data[0].acf.cta_1_beskrivelse}</p>
-                    </a>
+//             <section>
+//                 <h4 class="introCitat">${data[0].acf.cta_intro_citat} <br> <img class="LillaHjerte" src="assets/images/hjerte.svg" alt="Lilla Hjerte"></h4>
 
-                    <a class="homePageCTA" href="index.html?om">
-                        <img class="circularImg" src="${data[0].acf.cta_2_billede.url}" alt="Lyserøde rhododendron blomster">
-                        <h3>${data[0].acf.cta_2_overskrift}</h3>
-                        <p>${data[0].acf.cta_2_beskrivelse}</p>
-                    </a>
+//                 <div class="CTASection">
+//                     <a class="homePageCTA" href="index.html?behandlinger">
+//                         <img class="circularImg" src="${data[0].acf.cta_1_billede.url}" alt="Susanne igang med en behandling">
+//                         <h3>${data[0].acf.cta_1_overskrift}</h3>
+//                         <p>${data[0].acf.cta_1_beskrivelse}</p>
+//                     </a>
 
-                    <a class="homePageCTA" href="index.html?kontakt">
-                        <img class="circularImg" src="${data[0].acf.cta_3_billede.url}" alt="Billede af en solnedgang ved Løkken mole">
-                        <h3>${data[0].acf.cta_3_overskrift}</h3>
-                        <p>${data[0].acf.cta_3_beskrivelse}</p>
-                    </a>
-                </div>
-            </section>
-            
-            <section class="testimonialsSection">
-                <h3>${data[0].acf.anmeldelser_overskrift}</h3>
-                <div class="testimonialsDivMobile">
-                    <!-- Angle-left ikon: https://fontawesome.com/icons/angle-left?s=solid -->
-                    <button id="backBtnMobile"><i class="fa-solid fa-angle-left"></i></button>
-                    <section class="reviewSectionMobile"></section>
-                    <!-- Angle-right ikon: https://fontawesome.com/icons/angle-right?s=solid -->
-                    <button id="forwardBtnMobile"><i class="fa-solid fa-angle-right"></i></button>
-                </div>
-        
-                <div class="testimonialsDivDesktop">
-                    <!-- Angle-left ikon: https://fontawesome.com/icons/angle-left?s=solid -->
-                    <button id="backBtnDesktop"><i class="fa-solid fa-angle-left"></i></button>
-                    <section class="reviewSectionDesktop"></section>
-                    <!-- Angle-right ikon: https://fontawesome.com/icons/angle-right?s=solid -->
-                    <button id="forwardBtnDesktop"><i class="fa-solid fa-angle-right"></i></button>
-                </div>
-            </section>
-        `;
+//                     <a class="homePageCTA" href="index.html?om">
+//                         <img class="circularImg" src="${data[0].acf.cta_2_billede.url}" alt="Lyserøde rhododendron blomster">
+//                         <h3>${data[0].acf.cta_2_overskrift}</h3>
+//                         <p>${data[0].acf.cta_2_beskrivelse}</p>
+//                     </a>
 
-        document.querySelector('main').innerHTML += content;
+//                     <a class="homePageCTA" href="index.html?kontakt">
+//                         <img class="circularImg" src="${data[0].acf.cta_3_billede.url}" alt="Billede af en solnedgang ved Løkken mole">
+//                         <h3>${data[0].acf.cta_3_overskrift}</h3>
+//                         <p>${data[0].acf.cta_3_beskrivelse}</p>
+//                     </a>
+//                 </div>
+//             </section>
 
-        //Funktionskald af showReviewsMobile og showReviewsDesktop - begge kaldes her, men indholdet der vises på siden styres af 
-        //media queries i style.css
-        showReviewsMobile(reviews);
-        showReviewsDesktop(reviews);
-    })
+//             <section class="testimonialsSection">
+//                 <h3>${data[0].acf.anmeldelser_overskrift}</h3>
+//                 <div class="testimonialsDivMobile">
+//                     <!-- Angle-left ikon: https://fontawesome.com/icons/angle-left?s=solid -->
+//                     <button id="backBtnMobile"><i class="fa-solid fa-angle-left"></i></button>
+//                     <section class="reviewSectionMobile"></section>
+//                     <!-- Angle-right ikon: https://fontawesome.com/icons/angle-right?s=solid -->
+//                     <button id="forwardBtnMobile"><i class="fa-solid fa-angle-right"></i></button>
+//                 </div>
 
-    .catch(error => {
-        console.log(error);
-    })
-}
+//                 <div class="testimonialsDivDesktop">
+//                     <!-- Angle-left ikon: https://fontawesome.com/icons/angle-left?s=solid -->
+//                     <button id="backBtnDesktop"><i class="fa-solid fa-angle-left"></i></button>
+//                     <section class="reviewSectionDesktop"></section>
+//                     <!-- Angle-right ikon: https://fontawesome.com/icons/angle-right?s=solid -->
+//                     <button id="forwardBtnDesktop"><i class="fa-solid fa-angle-right"></i></button>
+//                 </div>
+//             </section>
+//         `;
 
-//showReviewsMobile(reviews) sørger for visningen af anmeldelser på mobilversionen af hjemmesiden
-function showReviewsMobile(reviews) {
-    var reviewSection = document.querySelector('.reviewSectionMobile');
-    var backBtn = document.querySelector('#backBtnMobile');
-    var forwardBtn = document.querySelector('#forwardBtnMobile');
+//         document.querySelector('main').innerHTML += content;
 
-    //i repræsenterer indekset af reviews[]. Starter på 0
-    let i = 0;
-    reviewSection.innerHTML = reviews[i];
+//         //Funktionskald af showReviewsMobile og showReviewsDesktop - begge kaldes her, men indholdet der vises på siden styres af 
+//         //media queries i style.css
+//         showReviewsMobile(reviews);
+//         showReviewsDesktop(reviews);
+//     })
 
-    //Når der klikkes på forwardBtn tælles i én op og reviewSections innerHTML ændres til den næste anmeldelse 
-    forwardBtn.addEventListener('click', () => {
-        i = i + 1;
-        reviewSection.innerHTML = reviews[i];
-        //Hvis i ender på den sidste anmeldelse fjernes knappen, så der ikke kan trykkes videre ved at sætte display: none på i 
-        //style.css
-        if (i === reviews.length - 1) {
-            forwardBtn.style.display = "none";
-        }
-        //backBtn styles med display: block, så den altid vises når der er mulighed for at gå tilbage, altså når der er trykket på 
-        //forwardBtn knappen
-        backBtn.style.display = "block";
-    });
+//     .catch(error => {
+//         console.log(error);
+//     })
+// }
 
-    //Her sker det omvendte af ovenstående event listener, hvor i tælles ned i stedet for, og ikke kan gå under 0 
-    backBtn.addEventListener('click', () => {
-        i = i - 1;
-        reviewSection.innerHTML = reviews[i];
-        if (i === 0) {
-            backBtn.style.display = "none";
-        }
-        forwardBtn.style.display = "block";
-    });
-}
 
-//showReviewsDesktop(reviews) sørger for visningen af anmeldelser på mobilversionen af hjemmesiden
-//Fungerer på samme måde som showReviewsMobile(reviews), med nogle få justeringer som gennemgås her
-function showReviewsDesktop(reviews) {
-    var reviewSection = document.querySelector('.reviewSectionDesktop');
-    var backBtn = document.querySelector('#backBtnDesktop');
-    var forwardBtn = document.querySelector('#forwardBtnDesktop');
-
-    let i = 0;
-    //I stedet for at vise det første element vises to 
-    reviewSection.innerHTML = reviews[i];
-    reviewSection.innerHTML += reviews[i + 1];
-    forwardBtn.addEventListener('click', () => {
-        i = i + 1;
-        //Her vises to elementer i stedet for et, hvor det sidste tælles op
-        reviewSection.innerHTML = reviews[i];
-        reviewSection.innerHTML += reviews[i + 1];
-        if (i + 1 === reviews.length - 1) {
-            forwardBtn.style.display = "none";
-        }
-        backBtn.style.display = "block";
-    });
-
-    backBtn.addEventListener('click', () => {
-        i = i - 1;
-        //Her vises to elementer i stedet for et, hvor det sidste tælles op
-        reviewSection.innerHTML = reviews[i];
-        reviewSection.innerHTML += reviews[i + 1];
-        if (i === 0) {
-            backBtn.style.display = "none";
-        }
-        forwardBtn.style.display = "block";
-    });
-}
 
 //renderFooter() opretter HTML til footeren og sætter det ind i <footer> i index.html
 function renderFooter() {

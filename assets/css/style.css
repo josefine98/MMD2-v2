@@ -320,6 +320,10 @@ footer .logo {
     text-align: center;
 }
 
+#backBtnMobile, #backBtnDesktop {
+    display: none; 
+}
+
 .fa-angle-right, .fa-angle-left {
     color: var(--white); 
 }
